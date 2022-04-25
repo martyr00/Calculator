@@ -8,3 +8,4 @@ authors = ["Batazov Yura <leonyv04@gmail.com>"]
 
 [dependencies]
 eframe = "0.14.0"
+regex = "1"
