@@ -27,7 +27,7 @@ struct ButtonsChar {
 
 impl Calculator {
     fn new() -> Calculator {
-        let iter_char = (["+", "-", "/", "*"]).map(|var_for_char| ButtonsChar {
+        let iter_char = ([" + ", " - ", " / ", " * "]).map(|var_for_char| ButtonsChar {
             char: var_for_char.to_string(),
         });
         Calculator {
@@ -81,27 +81,37 @@ fn top_label_panel(second_value: &String, first_value: &String, is_action: &bool
     return label;
 }
 
+fn equals_match(first_value: &String, second_value: &String, action: &String) -> f32 {
+    let a: f32 = String::from(first_value).parse().unwrap();
+    let b: f32 = String::from(second_value).parse().unwrap();
+
+    let result = match action.as_str() {
+        " + " => a + b,
+        " - " => a - b,
+        " * " => a * b,
+        " / " => a / b,
+        _ => a + a,
+    };
+
+    return result;
+}
+
 impl App for Calculator {
     fn update(&mut self, ctx: &CtxRef, _frame: &mut Frame<'_>) {
-        egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
+        egui::TopBottomPanel::top("label").show(ctx, |ui| {
             let label = top_label_panel(
                 &self.second_number,
                 &self.first_number,
                 &self.is_action_clicked,
             );
+
             ui.horizontal(|ui| {
-                let button_equals = egui::Button::new("=").text_color(WHITE);
-                let response = button_equals.ui(ui); //.add_sized([50.0, 50.0], button_equals);
-                if response.clicked() {
-                    let a: f32 = self.first_number.parse().unwrap();
-                    let b: f32 = self.second_number.parse().unwrap();
-                    let result = match self.action.as_str() {
-                        "+" => a + b,
-                        "-" => a - b,
-                        "*" => a * b,
-                        "/" => a / b,
-                        _ => 0.0,
-                    };
+                let button_equals = egui::Button::new(" = ").text_color(WHITE).small();
+                let response_equals = (button_equals).ui(ui);
+
+                if response_equals.clicked() {
+                    let result = equals_match(&self.first_number, &self.second_number, &self.action);
+
                     self.first_number = result.to_string();
                     self.second_number = String::from("0");
                     self.action = String::from("");
@@ -112,9 +122,12 @@ impl App for Calculator {
             });
             ui.add_space(PADDING);
         });
-        egui::SidePanel::left("my_left_panel").show(ctx, |ui| {
+        egui::SidePanel::left("chars").show(ctx, |ui| {
             for a in &self.actions {
-                let button_chars = egui::Button::new(&a.char).text_color(ORANGE);
+                let button_chars = egui::Button::new(&a.char)
+                    .fill(ORANGE)
+                    .text_color(WHITE)
+                    .small();
                 let response = button_chars.ui(ui);
 
                 if response.clicked() {
@@ -127,20 +140,17 @@ impl App for Calculator {
         });
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             let vec_digits = vec![
-                vec!["0"],
-                vec!["1", "2", "3"],
-                vec!["4", "5", "6"],
-                vec!["7", "8", "9"],
+                vec!["        0       "],
+                vec![" 1 ", " 2 ", " 3 "],
+                vec![" 4 ", " 5 ", " 6 "],
+                vec![" 7 ", " 8 ", " 9 "],
             ];
-
-            //.add_sized([50.0, 50.0], button_equals);
 
             for row in vec_digits {
                 ui.horizontal(|ui| {
                     for item in row {
-                        let button_equals = egui::Button::new(item).text_color(WHITE);
+                        let button_equals = egui::Button::new(item).text_color(WHITE).small();
                         let response = button_equals.ui(ui);
-
                         if response.clicked() {
                             if self.is_action_clicked {
                                 self.second_number = prepare_string(&self.second_number, &item);
@@ -153,6 +163,7 @@ impl App for Calculator {
             }
         });
     }
+
     fn setup(
         &mut self,
         ctx: &eframe::egui::CtxRef,
@@ -170,6 +181,6 @@ impl App for Calculator {
 fn main() {
     let app = Calculator::new();
     let mut win_option = NativeOptions::default();
-    win_option.initial_window_size = Some(Vec2::new(260., 320.));
+    win_option.initial_window_size = Some(Vec2::new(265., 240.));
     run_native(Box::new(app), win_option);
 }
