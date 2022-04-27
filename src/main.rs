@@ -110,7 +110,8 @@ impl App for Calculator {
                 let response_equals = (button_equals).ui(ui);
 
                 if response_equals.clicked() {
-                    let result = equals_match(&self.first_number, &self.second_number, &self.action);
+                    let result =
+                        equals_match(&self.first_number, &self.second_number, &self.action);
 
                     self.first_number = result.to_string();
                     self.second_number = String::from("0");
@@ -140,10 +141,10 @@ impl App for Calculator {
         });
         CentralPanel::default().show(ctx, |ui: &mut Ui| {
             let vec_digits = vec![
-                vec!["        0       "],
-                vec![" 1 ", " 2 ", " 3 "],
-                vec![" 4 ", " 5 ", " 6 "],
-                vec![" 7 ", " 8 ", " 9 "],
+                vec!["7", "8", "9"],
+                vec!["4", "5", "6"],
+                vec!["1", "2", "3"],
+                vec!["0"],
             ];
 
             for row in vec_digits {
